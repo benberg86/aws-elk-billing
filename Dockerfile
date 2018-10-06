@@ -26,7 +26,9 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
 COPY go-wrapper /usr/local/bin/
 
+RUN apt-get update
 RUN apt-get install -y python
+RUN apt-get install -y python-dev
 RUN apt-get install -y python-pip
 RUN pip install boto3
 RUN pip install pyelasticsearch
@@ -34,7 +36,7 @@ RUN pip install nose
 
 WORKDIR /aws-elk-billing
 
-ENV TZ=Asia/Kolkata
+ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 CMD ["/sbin/init"]

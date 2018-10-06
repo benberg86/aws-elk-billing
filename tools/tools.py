@@ -59,7 +59,7 @@ class Tools:
 
         for _ in range(15):
             try:
-                print 'Checking if Kibana container has started to listen to 5160'
+                print 'Checking if Kibana container has started to listen to 5601'
                 kibana_socket.connect(('kibana', 5601))
                 print 'Great Kibana is listening on 5601 :)'
                 connection_ok = True
@@ -77,7 +77,7 @@ class Tools:
         return connection_ok
 
     def index_template(self):
-        out = subprocess.check_output(['curl -XHEAD -i "elasticsearch:9200/_template/aws_billing"'], shell=True, stderr=subprocess.PIPE)
+        out = subprocess.check_output(['curl --head "elasticsearch:9200/_template/aws_billing"'], shell=True, stderr=subprocess.PIPE)
         if '200 OK' not in out:
             status = subprocess.Popen(
                 ['curl -XPUT elasticsearch:9200/_template/aws_billing -d "`cat /aws-elk-billing/aws-billing-es-template.json`"'],
@@ -91,11 +91,17 @@ class Tools:
             print 'Template already exists'
 
     def get_s3_bucket_dir_to_index(self):
+        if len(self.path_name_s3_billing) == 1:
+            prefix = '/' + '/'.join(self.path_name_s3_billing) + '/'
+        else:
+            prefix='/'.join(self.path_name_s3_billing) + '/'
+
         key_names = self.s3.list_objects(
 				Bucket=self.bucketname,
-				Prefix='/' + '/'.join(self.path_name_s3_billing) + '/',
+				Prefix=prefix,
 				Delimiter='/')
         s3_dir_names = []
+
         if 'CommonPrefixes' not in key_names:
             return 1
 
@@ -134,7 +140,10 @@ class Tools:
     def get_latest_zip_filename(self, monthly_dir_name):
         # monthly_dir_name for aws s3 directory format for getting the correct json file
         # json file name
-        latest_json_file_name = '/' + '/'.join(self.path_name_s3_billing + [monthly_dir_name, self.s3_report_name + '-Manifest.json'])
+        if len(self.path_name_s3_billing) == 1:
+            latest_json_file_name = '/' + '/'.join(self.path_name_s3_billing + [monthly_dir_name, self.s3_report_name + '-Manifest.json'])
+        else:
+            latest_json_file_name = '/'.join(self.path_name_s3_billing + [monthly_dir_name, self.s3_report_name + '-Manifest.json'])
 
         # download the jsonfile as getfile_$time.json from s3
         print('Downloading {}...'.format(latest_json_file_name))

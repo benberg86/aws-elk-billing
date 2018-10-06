@@ -32,11 +32,15 @@ class Test_Functions:
     def test_ub_cost(self):
         result = subprocess.check_output(['curl -XGET "http://elasticsearch:9200/aws-billing-2016.06/_search" -d "`cat /aws-elk-billing/test/tools/aggregate.json`"'],
             shell=True, stderr=subprocess.PIPE)
+        result = subprocess.check_output(['curl -XGET "http://elasticsearch:9200/aws-billing-2016.06/_search" -d "`cat /aws-elk-billing/test/tools/aggregate.json`"'],
+            shell=True, stderr=subprocess.PIPE)
+        result = subprocess.check_output(['curl -XGET "http://elasticsearch:9200/aws-billing-2016.06/_search" -d "`cat /aws-elk-billing/test/tools/aggregate.json`"'],
+            shell=True, stderr=subprocess.PIPE)
         print(result)
         result = simplejson.loads(result)
         sum_ub_cost = result["aggregations"]["sum_ub_cost"]["value"]
         assert_equals(
             float(format(sum_ub_cost,'.3f')),
-            1.242,
+            0.201,
             'Must return the exact sum as the csv file'
         )

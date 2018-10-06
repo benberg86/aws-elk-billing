@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # index a sample test file with sum of unblended cost 1.24185686
     tools.index_csv('test/sample/test_ub_cost_2016-06.csv', '20160601-20160701')
     # rows of data in the csv, must be given as string
-    data_count = '315'
+    data_count = '300'
     while(True):
         index_names = subprocess.check_output(['curl -XGET "elasticsearch:9200/_cat/indices/"'], shell=True, stderr=subprocess.PIPE)
         if 'aws-billing-2016.06' in index_names and data_count in index_names:
